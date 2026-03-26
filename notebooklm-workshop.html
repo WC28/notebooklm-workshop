@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NotebookLM Workshop — โรงพยาบาลจิตเวชนครราชสีมา</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&family=IBM+Plex+Sans+Thai:wght@300;400;500;700&display=swap');
+
+  :root {
+    --teal: #0B7A6E;
+    --teal-light: #13A698;
+    --teal-pale: #E0F5F3;
+    --navy: #0D2B45;
+    --gold: #F5A623;
+    --gold-light: #FDEAC0;
+    --white: #FFFFFF;
+    --gray: #F4F7F8;
+    --text: #1A2D3A;
+    --text-muted: #5A7080;
+    --accent: #E74C6F;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: #F0F6F6;
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* ===== COVER ===== */
+  .cover {
+    background: linear-gradient(135deg, var(--navy) 0%, #0B4F6C 50%, var(--teal) 100%);
+    color: white;
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .cover::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(19,166,152,0.15);
+  }
+  .cover .badge {
+    display: inline-block;
+    background: rgba(245,166,35,0.25);
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    padding: 6px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 22px;
+    text-transform: uppercase;
+  }
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+  .cover h1 span { color: var(--gold); }
+  .cover .subtitle {
+    font-size: 18px;
+    opacity: 0.85;
+    margin-bottom: 24px;
+    font-weight: 300;
+  }
+  .cover .meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .cover .meta-item {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  .cover .meta-item strong { color: var(--gold); display: block; font-size: 13px; }
+
+  /* ===== LAYOUT ===== */
+  .page { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
+
+  /* ===== SECTION HEADER ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 48px 0 24px;
+  }
+  .section-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(11,122,110,0.08);
+    border-left: 4px solid var(--teal);
+  }
+  .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p { color: var(--text-muted); font-size: 15px; }
+
+  /* ===== FEATURE GRID ===== */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .feature-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+    border-top: 3px solid var(--teal-light);
+  }
+  .feature-card:hover { transform: translateY(-3px); }
+  .feature-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .feature-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .feature-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .feature-card .tag {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--teal-pale);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* ===== ACTIVITY CARDS ===== */
+  .activity {
+    background: white;
+    border-radius: 16px;
+    padding: 26px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .act-num {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--teal), #0F9B8E);
+    color: white;
+    font-size: 26px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .act-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .act-content .time-badge {
+    display: inline-block;
+    background: var(--gold-light);
+    color: #8A6010;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .act-content p { color: var(--text-muted); font-size: 15px; margin-bottom: 12px; }
+  .steps {
+    list-style: none;
+    padding: 0;
+  }
+  .steps li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 6px;
+    padding: 8px 12px;
+    background: var(--gray);
+    border-radius: 8px;
+  }
+  .steps li .step-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ===== SCHEDULE TABLE ===== */
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .schedule-table th {
+    background: var(--teal);
+    color: white;
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .schedule-table td {
+    padding: 12px 18px;
+    font-size: 14px;
+    border-bottom: 1px solid #EEF2F3;
+    color: var(--text);
+  }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .schedule-table tr:nth-child(even) td { background: var(--gray); }
+  .td-time { font-weight: 700; color: var(--teal); white-space: nowrap; }
+  .td-act { font-weight: 600; }
+  .td-type {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .type-intro { background: #E8F4FD; color: #1A6FA0; }
+  .type-hands { background: #FFF0E0; color: #B85B00; }
+  .type-activity { background: #E6F9F6; color: var(--teal); }
+  .type-break { background: #F0F0F0; color: #666; }
+
+  /* ===== TIPS ===== */
+  .tip-box {
+    background: linear-gradient(135deg, var(--teal-pale), #C8EDE9);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--teal);
+  }
+  .tip-box h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+  .tip-box p, .tip-box li { font-size: 14px; color: var(--text); }
+  .tip-box ul { padding-left: 18px; }
+
+  /* ===== USE CASE HOSPITAL ===== */
+  .usecase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .usecase-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-bottom: 3px solid var(--gold);
+  }
+  .usecase-card .uc-icon { font-size: 28px; margin-bottom: 8px; }
+  .usecase-card h5 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .usecase-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 28px;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+  .footer strong { color: white; }
+
+  /* ===== HIGHLIGHT BOX ===== */
+  .highlight {
+    background: linear-gradient(135deg, #FFF8E8, var(--gold-light));
+    border-radius: 14px;
+    padding: 22px 26px;
+    border-left: 4px solid var(--gold);
+    margin-bottom: 20px;
+  }
+  .highlight h4 { color: #7A5000; font-weight: 700; margin-bottom: 8px; font-size: 16px; }
+  .highlight p { font-size: 14px; color: #5A3B00; }
+
+  /* divider */
+  .divider {
+    border: none;
+    border-top: 2px dashed #D0E8E6;
+    margin: 40px 0;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="badge">🏥 Workshop Materials · 27 มีนาคม 2568</div>
+  <h1>คู่มือ Workshop<br><span>NotebookLM AI</span></h1>
+  <p class="subtitle">เครื่องมือ AI สำหรับการจัดการความรู้และพัฒนางาน</p>
+  <div class="meta">
+    <div class="meta-item"><strong>สถานที่</strong>โรงพยาบาลจิตเวชนครราชสีมา</div>
+    <div class="meta-item"><strong>เครื่องมือ</strong>Google NotebookLM (ฟรี)</div>
+    <div class="meta-item"><strong>ระดับ</strong>เริ่มต้น – กลาง</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- SECTION 1: NotebookLM คืออะไร -->
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>NotebookLM คืออะไร?</h2>
+  </div>
+
+  <div class="card">
+    <h3>🤖 AI ผู้ช่วยวิจัยส่วนตัวจาก Google</h3>
+    <p>NotebookLM เป็นเครื่องมือ AI ของ Google ที่ทำงานแบบ <strong>"Grounded AI"</strong> — ตอบคำถามจากเอกสารที่คุณอัปโหลดเท่านั้น ไม่ประดิษฐ์ข้อมูล ทุกคำตอบมีการอ้างอิงกลับไปยังแหล่งที่มา ใช้งานได้ฟรีผ่าน Google Account</p>
+  </div>
+
+  <div class="highlight">
+    <h4>💡 ต่างจาก ChatGPT อย่างไร?</h4>
+    <p>ChatGPT ตอบจากความรู้ทั่วไปบนอินเทอร์เน็ต ซึ่งอาจเกิดการประดิษฐ์ข้อมูล (Hallucination)<br>
+    <strong>NotebookLM</strong> ตอบจากเอกสารของคุณเท่านั้น → ข้อมูลแม่นยำ เชื่อถือได้ มีการอ้างอิง</p>
+  </div>
+
+  <!-- SECTION 2: ฟีเจอร์หลัก -->
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>ฟีเจอร์หลักของ NotebookLM</h2>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <h4>อัปโหลดหลายแหล่ง</h4>
+      <p>รองรับ PDF, Word, Google Docs, เว็บไซต์ (URL), วิดีโอ YouTube, ข้อความธรรมดา</p>
+      <span class="tag">สูงสุด 50 แหล่ง/Notebook (ฟรี)</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <h4>Chat กับเอกสาร</h4>
+      <p>ถามคำถาม สรุปเนื้อหา เปรียบเทียบข้อมูล ค้นหาข้อมูลเฉพาะ พร้อมอ้างอิง</p>
+      <span class="tag">รองรับภาษาไทย</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎙️</div>
+      <h4>Audio Overview (Podcast AI)</h4>
+      <p>แปลงเอกสารเป็นพอดแคสต์ AI 2 คน พูดสรุปเนื้อหา ฟังขณะเดินทางได้</p>
+      <span class="tag">ฟีเจอร์เด่นที่สุด</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📋</div>
+      <h4>สรุปอัตโนมัติ</h4>
+      <p>สร้าง Study Guide, FAQ, Briefing Doc, Outline จากเอกสารในไม่กี่วินาที</p>
+      <span class="tag">ประหยัดเวลา</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🃏</div>
+      <h4>Flashcard & Quiz</h4>
+      <p>สร้างแบบทดสอบ และ flashcard จากเอกสาร เหมาะสำหรับการอบรมบุคลากร</p>
+      <span class="tag">ใหม่ Sep 2025</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📄</div>
+      <h4>สร้างรายงาน/Slide</h4>
+      <p>สร้างรายงาน, Blog Post, Infographic ได้จากแหล่งข้อมูลใน Notebook</p>
+      <span class="tag">Export ได้</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎓</div>
+      <h4>Learning Guide</h4>
+      <p>ทำหน้าที่เป็นติวเตอร์ส่วนตัว อธิบายเนื้อหาแบบเชิงลึก พร้อมตัวอย่างประกอบ</p>
+      <span class="tag">ใหม่ Oct 2025</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <h4>แชร์ Notebook</h4>
+      <p>แชร์ลิงก์ให้ทีมงานเพื่อเข้าถึงและ Chat กับเนื้อหาร่วมกันได้</p>
+      <span class="tag">ทำงานเป็นทีม</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h4>Mobile App</h4>
+      <p>มีแอปบน iOS และ Android ฟังพอดแคสต์ offline และ Chat ได้ทุกที่</p>
+      <span class="tag">Android & iOS</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 3: Use Case สำหรับโรงพยาบาล -->
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>ตัวอย่างการใช้งานในโรงพยาบาลจิตเวช</h2>
+  </div>
+
+  <div class="usecase-grid">
+    <div class="usecase-card">
+      <div class="uc-icon">📑</div>
+      <h5>สรุปแนวทางการรักษา</h5>
+      <p>อัปโหลด CPG หรือ Clinical Protocol แล้วให้ AI สรุปข้อแนะนำสำคัญ</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">📚</div>
+      <h5>ทบทวนวรรณกรรม</h5>
+      <p>อัปโหลดบทความวิชาการหลายฉบับ ค้นหาและสรุปข้อสรุปร่วม</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">🎓</div>
+      <h5>อบรมบุคลากร</h5>
+      <p>สร้าง Quiz และ Flashcard จากคู่มือการอบรม ทดสอบความเข้าใจ</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">📋</div>
+      <h5>จัดการ KM / R2R</h5>
+      <p>รวบรวมองค์ความรู้จากการวิจัย R2R ค้นหาข้อมูลได้ทันที</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">📢</div>
+      <h5>เตรียม Presentation</h5>
+      <p>สรุป Grand Round หรือเตรียมเนื้อหานำเสนอจากเอกสารวิชาการ</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">🧠</div>
+      <h5>ทำความเข้าใจ DSM-5</h5>
+      <p>อัปโหลด DSM-5 แล้วถามถึงเกณฑ์วินิจฉัยโรค เปรียบเทียบอาการ</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">📊</div>
+      <h5>วิเคราะห์รายงานคุณภาพ</h5>
+      <p>อัปโหลดรายงาน HA / JCI ค้นหาจุดที่ต้องพัฒนา</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-icon">🔊</div>
+      <h5>สื่อความรู้ผู้ป่วย</h5>
+      <p>สรุปโรคและการดูแลเป็นภาษาง่าย เพื่อนำไปทำสื่อให้ผู้ป่วย/ญาติ</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 4: กิจกรรม Workshop -->
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>กิจกรรม Workshop (5 กิจกรรม)</h2>
+  </div>
+
+  <div class="activity">
+    <div class="act-num">1</div>
+    <div class="act-content">
+      <h3>🚀 เริ่มต้นสร้าง Notebook แรก</h3>
+      <span class="time-badge">⏱ 15 นาที | ทั้งกลุ่ม</span>
+      <p>ให้ผู้เข้าร่วมสร้าง Notebook และอัปโหลดเอกสารที่เกี่ยวกับงานของตัวเอง</p>
+      <ul class="steps">
+        <li><span class="step-icon">1️⃣</span> ไปที่ <strong>notebooklm.google.com</strong> → Sign in ด้วย Google Account</li>
+        <li><span class="step-icon">2️⃣</span> กด "Create New Notebook" → ตั้งชื่อ</li>
+        <li><span class="step-icon">3️⃣</span> อัปโหลดเอกสาร เช่น คู่มือการดูแลผู้ป่วย, แนวทางการรักษา, หรือ PDF ที่ใช้งาน</li>
+        <li><span class="step-icon">4️⃣</span> สังเกต Notebook Overview ที่ AI สร้างให้อัตโนมัติ</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="act-num">2</div>
+    <div class="act-content">
+      <h3>💬 ถาม-ตอบกับเอกสารของตัวเอง</h3>
+      <span class="time-badge">⏱ 20 นาที | แบ่งกลุ่มย่อย 3-4 คน</span>
+      <p>ฝึกใช้ Chat เพื่อสกัดข้อมูลและสรุปเนื้อหาจากเอกสาร พร้อมดูการอ้างอิง</p>
+      <ul class="steps">
+        <li><span class="step-icon">🔍</span> ลองถาม: <em>"สรุปประเด็นสำคัญจากเอกสารนี้ให้หน่อย"</em></li>
+        <li><span class="step-icon">🔍</span> ลองถาม: <em>"แนวทางการรักษา [โรค] คืออะไร?"</em></li>
+        <li><span class="step-icon">🔍</span> ลองถาม: <em>"เอกสารนี้พูดถึงเรื่อง [หัวข้อ] ไว้อย่างไร?"</em></li>
+        <li><span class="step-icon">📌</span> คลิกตัวเลขอ้างอิงในคำตอบ เพื่อดูว่า AI เอาข้อมูลมาจากส่วนไหน</li>
+        <li><span class="step-icon">⭐</span> กด Pin คำตอบที่ดีไว้ใน Notes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="act-num">3</div>
+    <div class="act-content">
+      <h3>🎙️ สร้าง Audio Overview (Podcast AI)</h3>
+      <span class="time-badge">⏱ 15 นาที | ทั้งกลุ่ม + ฟังร่วมกัน</span>
+      <p>สร้างพอดแคสต์ AI จากเอกสาร เพื่อให้บุคลากรฟังทบทวนความรู้ได้ทุกที่</p>
+      <ul class="steps">
+        <li><span class="step-icon">1️⃣</span> ที่แถบ Studio (ขวามือ) → คลิก <strong>"Audio Overview"</strong></li>
+        <li><span class="step-icon">2️⃣</span> เลือกรูปแบบ: <strong>Deep Dive</strong> (สนทนา 2 คน) หรือ <strong>Brief</strong> (สรุปสั้น)</li>
+        <li><span class="step-icon">3️⃣</span> รอ ~2-3 นาที → กดเล่นฟัง</li>
+        <li><span class="step-icon">🎧</span> ลองรูปแบบ <strong>Debate</strong>: AI จะโต้เถียง 2 ฝ่ายเกี่ยวกับหัวข้อในเอกสาร</li>
+        <li><span class="step-icon">💾</span> Download ไฟล์เสียงเพื่อส่งต่อหรือใช้ในการอบรม</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="act-num">4</div>
+    <div class="act-content">
+      <h3>🃏 สร้าง Quiz และ Flashcard</h3>
+      <span class="time-badge">⏱ 15 นาที | แข่งขันกันในกลุ่ม</span>
+      <p>สร้างแบบทดสอบจากคู่มือหรือแนวทางการรักษา แล้วให้สมาชิกกลุ่มอื่นลองทำ</p>
+      <ul class="steps">
+        <li><span class="step-icon">1️⃣</span> ที่แถบ Studio → คลิก <strong>"Flashcards"</strong> หรือ <strong>"Quiz"</strong></li>
+        <li><span class="step-icon">2️⃣</span> ระบุหัวข้อหรือปล่อยให้ AI เลือกเอง</li>
+        <li><span class="step-icon">3️⃣</span> ลองทำ Quiz → กด "Explain" หากตอบผิด เพื่อดูคำอธิบาย</li>
+        <li><span class="step-icon">🔗</span> <strong>แชร์ลิงก์</strong> Quiz/Flashcard ให้เพื่อนร่วมงาน → ทดสอบความรู้กันทั้งทีม</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="act-num">5</div>
+    <div class="act-content">
+      <h3>🏥 Challenge: แก้ปัญหางานจริง</h3>
+      <span class="time-badge">⏱ 20 นาที | แบ่งกลุ่ม + นำเสนอ</span>
+      <p>ให้แต่ละกลุ่มนำโจทย์จากงานจริงมาทดลองใช้ NotebookLM แก้ปัญหา แล้วนำเสนอ 2 นาที</p>
+      <ul class="steps">
+        <li><span class="step-icon">🔴</span> <strong>กลุ่ม 1 – พยาบาล:</strong> อัปโหลดคู่มือดูแลผู้ป่วย → สร้าง FAQ สำหรับนักศึกษาฝึกงาน</li>
+        <li><span class="step-icon">🟠</span> <strong>กลุ่ม 2 – แพทย์/จิตแพทย์:</strong> อัปโหลด Clinical Guideline → สรุปเกณฑ์วินิจฉัย</li>
+        <li><span class="step-icon">🟡</span> <strong>กลุ่ม 3 – นักจิตวิทยา/สังคมสงเคราะห์:</strong> อัปโหลดบทความ → สรุปหลักฐานเชิงประจักษ์</li>
+        <li><span class="step-icon">🟢</span> <strong>กลุ่ม 4 – ฝ่ายบริหาร/QA:</strong> อัปโหลดรายงานคุณภาพ → วิเคราะห์จุดปรับปรุง</li>
+        <li><span class="step-icon">🎤</span> แต่ละกลุ่มนำเสนอ: "ใช้ NotebookLM ทำอะไร? ผลลัพธ์เป็นอย่างไร?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 5: ตารางเวลา -->
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>ตารางเวลา Workshop (3 ชั่วโมง)</h2>
+  </div>
+
+  <table class="schedule-table">
+    <thead>
+      <tr>
+        <th>เวลา</th>
+        <th>กิจกรรม</th>
+        <th>รูปแบบ</th>
+        <th>เวลา</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-time">09:00–09:20</td>
+        <td class="td-act">🎯 แนะนำ NotebookLM คืออะไร ทำไมต้องใช้</td>
+        <td><span class="td-type type-intro">บรรยาย</span></td>
+        <td>20 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">09:20–09:35</td>
+        <td class="td-act">🚀 กิจกรรม 1: สร้าง Notebook แรก</td>
+        <td><span class="td-type type-hands">ลงมือทำ</span></td>
+        <td>15 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">09:35–10:00</td>
+        <td class="td-act">💬 กิจกรรม 2: Chat กับเอกสาร</td>
+        <td><span class="td-type type-activity">กลุ่มย่อย</span></td>
+        <td>25 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">10:00–10:15</td>
+        <td class="td-act">☕ พักเบรก</td>
+        <td><span class="td-type type-break">พัก</span></td>
+        <td>15 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">10:15–10:30</td>
+        <td class="td-act">🎙️ กิจกรรม 3: สร้าง Audio Overview</td>
+        <td><span class="td-type type-hands">ลงมือทำ</span></td>
+        <td>15 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">10:30–10:45</td>
+        <td class="td-act">🃏 กิจกรรม 4: Quiz & Flashcard Challenge</td>
+        <td><span class="td-type type-activity">แข่งขัน</span></td>
+        <td>15 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">10:45–11:20</td>
+        <td class="td-act">🏥 กิจกรรม 5: Challenge โจทย์งานจริง</td>
+        <td><span class="td-type type-activity">กลุ่มนำเสนอ</span></td>
+        <td>35 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">11:20–11:40</td>
+        <td class="td-act">🌟 Use Cases ขั้นสูง + Tips & แผนการนำไปใช้</td>
+        <td><span class="td-type type-intro">บรรยาย</span></td>
+        <td>20 นาที</td>
+      </tr>
+      <tr>
+        <td class="td-time">11:40–12:00</td>
+        <td class="td-act">❓ ถาม-ตอบ + ประเมินผล + ปิด Workshop</td>
+        <td><span class="td-type type-intro">ปิด</span></td>
+        <td>20 นาที</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- SECTION 6: Tips -->
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>เคล็ดลับสำหรับวิทยากร</h2>
+  </div>
+
+  <div class="tip-box">
+    <h4>✅ เตรียมก่อน Workshop</h4>
+    <ul>
+      <li>เตรียม PDF เอกสารที่เกี่ยวกับการดูแลผู้ป่วยจิตเวชไว้ล่วงหน้า (เช่น Clinical Guideline, คู่มือยา)</li>
+      <li>ให้ผู้เข้าร่วม Sign in Google Account ก่อนเริ่ม Workshop</li>
+      <li>ทดสอบ Internet ที่ห้องประชุมก่อนวันจริง</li>
+      <li>สร้าง Notebook ตัวอย่างไว้ล่วงหน้า เพื่อ Demo ให้ดูก่อน</li>
+    </ul>
+  </div>
+
+  <div class="tip-box">
+    <h4>💡 Prompt ที่แนะนำสำหรับบุคลากรสาธารณสุข</h4>
+    <ul>
+      <li><em>"สรุปแนวทางการรักษา [ชื่อโรค] จากเอกสารนี้เป็นข้อๆ"</em></li>
+      <li><em>"เปรียบเทียบยา A และยา B จากเอกสารที่อัปโหลด"</em></li>
+      <li><em>"สร้าง FAQ 10 ข้อ สำหรับนักศึกษาที่เรียนเรื่องนี้"</em></li>
+      <li><em>"อธิบายเกณฑ์วินิจฉัย [โรค] แบบง่ายๆ ให้ผู้ป่วยเข้าใจ"</em></li>
+      <li><em>"มีประเด็นอะไรในเอกสารที่ขัดแย้งกัน หรือต้องระวังบ้าง?"</em></li>
+    </ul>
+  </div>
+
+  <div class="highlight">
+    <h4>⚠️ ข้อควรระวัง</h4>
+    <p>
+      • ข้อมูลผู้ป่วย (PHI) <strong>ห้ามอัปโหลด</strong> เนื่องจาก Privacy Policy — ใช้กับเอกสารวิชาการ คู่มือ หรือแนวทางเท่านั้น<br>
+      • NotebookLM เป็นเครื่องมือช่วย <strong>ไม่ใช่ผู้เชี่ยวชาญ</strong> ตรวจสอบข้อมูลทางการแพทย์กับแหล่งต้นฉบับเสมอ<br>
+      • ใช้งานฟรี แต่มีขีดจำกัด: 50 แหล่ง/Notebook, 3 Audio Overviews/วัน (บัญชีฟรี)
+    </p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>Workshop NotebookLM AI · โรงพยาบาลจิตเวชนครราชสีมา · 27 มีนาคม 2568</strong><br>
+  เข้าใช้งาน: <strong>notebooklm.google.com</strong> · ต้องการ Google Account เท่านั้น · ฟรี!
+</div>
+
+</body>
+</html>
